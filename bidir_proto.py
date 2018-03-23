@@ -1,6 +1,9 @@
 import numpy as np
-Xtrain = np.ones((3, 3, 4))
-YTrain = np.ones((3, 3, 5))
+Xtrain = np.ones((1, 3, 4))
+# a = np.ones([2,3])
+# b = np.ones([3,3])
+# Xtrain = np.array([[a],[b]])
+YTrain = np.ones((1, 3, 5))
 Xtest = np.ones((1,2,4))
 Ytest = np.ones((1,2, 5))
 

@@ -1,0 +1,179 @@
+done with loading training data ...
+done with loading word vectors ...
+done with sklearn imports ...
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 404290/404290 [2:11:14<00:00, 51.34it/s]
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 404290/404290 [3:21:52<00:00, 33.38it/s]
+DDDDDDDDDDDDDDDDDDDDDDDDDDDD
+Number of training pairs: 355775
+Number of testing pairs: 48515
+EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE
+Using TensorFlow backend.
+FFFFFFFFFFFFFF
+nlp.py:184: UserWarning: The `merge` function is deprecated and will be removed after 08/2017. Use instead layers from `keras.layers.merge`, e.g. `add`, `concatenate`, etc.
+  res2 = merge([relu1, bn2], mode='sum')
+/usr/local/lib/python2.7/dist-packages/keras/legacy/layers.py:464: UserWarning: The `Merge` layer is deprecated and will be removed after 08/2017. Use instead layers from `keras.layers.merge`, e.g. `add`, `concatenate`, etc.
+  name=name)
+nlp.py:189: UserWarning: The `Merge` layer is deprecated and will be removed after 08/2017. Use instead layers from `keras.layers.merge`, e.g. `add`, `concatenate`, etc.
+  res3 = Merge(mode='sum')([relu2, bn3])
+nlp.py:192: UserWarning: The `merge` function is deprecated and will be removed after 08/2017. Use instead layers from `keras.layers.merge`, e.g. `add`, `concatenate`, etc.
+  feats = merge([relu3, relu2, relu1], mode='concat')
+nlp.py:195: UserWarning: Update your `Model` call to the Keras 2 API: `Model(outputs=Tensor("ba..., inputs=Tensor("in...)`
+  model = Model(input=input, output=bn4)
+nlp.py:221: UserWarning: Update your `Model` call to the Keras 2 API: `Model(outputs=Tensor("la..., inputs=[<tf.Tenso...)`
+  model = Model(input=[input_a, input_b], output=distance)
+GGGGGGGGGGGGGGGGGGG
+nlp.py:241: UserWarning: The `nb_epoch` argument in `fit` has been renamed `epochs`.
+  batch_size=128, nb_epoch=1, shuffle=True, )
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+2018-03-17 01:19:57.217280: I tensorflow/core/platform/cpu_feature_guard.cc:137] Your CPU supports instructions that this TensorFlow binary was not compiled to use: SSE4.1 SSE4.2 AVX AVX2 FMA
+355775/355775 [==============================] - 46s 129us/step - loss: 8.6870 - val_loss: 0.2419
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 45s 125us/step - loss: 0.1992 - val_loss: 0.1901
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 45s 126us/step - loss: 0.1796 - val_loss: 0.1802
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 45s 126us/step - loss: 0.1711 - val_loss: 0.1745
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 45s 126us/step - loss: 0.1651 - val_loss: 0.1679
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 45s 126us/step - loss: 0.1600 - val_loss: 0.1668
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 45s 126us/step - loss: 0.1553 - val_loss: 0.1625
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 122us/step - loss: 0.1514 - val_loss: 0.1609
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 122us/step - loss: 0.1477 - val_loss: 0.1575
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 122us/step - loss: 0.1447 - val_loss: 0.1593
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 122us/step - loss: 0.1418 - val_loss: 0.1558
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 122us/step - loss: 0.1397 - val_loss: 0.1539
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 122us/step - loss: 0.1376 - val_loss: 0.1528
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 122us/step - loss: 0.1357 - val_loss: 0.1519
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 122us/step - loss: 0.1337 - val_loss: 0.1512
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1320 - val_loss: 0.1494
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1307 - val_loss: 0.1497
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 122us/step - loss: 0.1294 - val_loss: 0.1480
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1282 - val_loss: 0.1530
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1267 - val_loss: 0.1478
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1257 - val_loss: 0.1466
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 122us/step - loss: 0.1249 - val_loss: 0.1467
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1242 - val_loss: 0.1474
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1230 - val_loss: 0.1465
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1222 - val_loss: 0.1453
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 122us/step - loss: 0.1213 - val_loss: 0.1487
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1205 - val_loss: 0.1465
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1196 - val_loss: 0.1464
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 122us/step - loss: 0.1190 - val_loss: 0.1456
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1186 - val_loss: 0.1445
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1178 - val_loss: 0.1463
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1173 - val_loss: 0.1461
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1167 - val_loss: 0.1444
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1160 - val_loss: 0.1459
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1154 - val_loss: 0.1464
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1149 - val_loss: 0.1461
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1143 - val_loss: 0.1466
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1139 - val_loss: 0.1443
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1136 - val_loss: 0.1468
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1131 - val_loss: 0.1445
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1125 - val_loss: 0.1454
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1122 - val_loss: 0.1445
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1119 - val_loss: 0.1451
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1113 - val_loss: 0.1463
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1110 - val_loss: 0.1451
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1108 - val_loss: 0.1443
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 120us/step - loss: 0.1106 - val_loss: 0.1442
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 44s 122us/step - loss: 0.1101 - val_loss: 0.1455
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1097 - val_loss: 0.1440
+Train on 355775 samples, validate on 48515 samples
+Epoch 1/1
+355775/355775 [==============================] - 43s 121us/step - loss: 0.1094 - val_loss: 0.1439
+* Accuracy on test set: 80.22%
