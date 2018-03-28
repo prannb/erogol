@@ -212,8 +212,14 @@ def create_base_network(input_dim):
 	'''
 	# create_bidirLSTM()
 	input = Input(shape=(max_queslen,input_dim))
-	output1 = Bidirectional(LSTM(2, return_sequences=True), merge_mode='ave', input_shape=(max_queslen, input_dim))(input)
-	output2 = TimeDistributed(Dense(5, activation='relu'))(output1)
+	output1 = Bidirectional(LSTM(12, return_sequences=True), merge_mode='ave', input_shape=(max_queslen, input_dim))(input)
+	print("#####################################")
+	print(output1)	
+	print("#####################################")
+	output2 = TimeDistributed(Dense(30, activation='relu'))(output1)
+	print("#####################################")
+	print(output2)	
+	print("#####################################")
 	output3 = Flatten()(output2)
 	print("#####################################")
 	print(output3)	
@@ -311,12 +317,13 @@ print("GGGGGGGGGGGGGGGGGGG")
 for epoch in range(50):
 	net.fit([X_train1, X_train2], Y_train,
 		  validation_data=([X_test1, X_test2], Y_test),
-		  batch_size=128, nb_epoch=1, shuffle=True, )
+		  batch_size=128, nb_epoch=5, shuffle=True, )
 	
 	# compute final accuracy on training and test sets
 	pred = net.predict([X_test1, X_test2], batch_size=128)
 	print(pred.shape)
 	te_acc = compute_accuracy(pred, Y_test)
 	# print('* Accuracy on training set: %0.2f%%' % (100 * te_acc))
-print(pred)
+print(pred.shape)
+print(Y_test.shape)
 print('* Accuracy on test set: %0.2f%%' % (100 * te_acc))
