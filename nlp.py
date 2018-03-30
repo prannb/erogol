@@ -6,7 +6,7 @@ import os
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-df = pd.read_csv("quora10.tsv",delimiter='\t')
+df = pd.read_csv("quora_1.tsv",delimiter='\t')
  
 # encode questions to unicode
 df['question1'] = df['question1'].apply(lambda x: unicode(str(x),"utf-8"))
