@@ -1,5 +1,6 @@
-def main():
-	file = open('quora_w.tsv', 'r')
+def main(what):
+	read_file = 'quora_' + what + '.tsv'
+	file = open(read_file, 'r')
 	text = file.read()
 	text = text.split('\n')
 	# print (text[0])
@@ -11,7 +12,7 @@ def main():
 	corpus = "id	qid1	qid2	question1	question2	is_duplicate\n"
 	for i in text:
 		if (k%1000 == 0 and k!=0):
-			filename = "quora_" + str(j) + ".tsv"
+			filename = "quora_" + what + '_' + str(j) + ".tsv"
 			j = j + 1
 			res = open(filename, "w");
 			res.write(corpus)
@@ -24,4 +25,5 @@ def main():
 		k = k + 1
 		# print k
 
-main()
+main('train')
+main('test')

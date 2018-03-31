@@ -7,6 +7,139 @@ import pandas as pd
 import tensorflow as tf
 import numpy as np
 from tqdm import tqdm
+df = pd.read_csv("quora1000.tsv",delimiter='\t')
+
+# encode questions to unicode
+df['question1'] = df['question1'].apply(lambda x: unicode(str(x),"utf-8"))
+df['question2'] = df['question2'].apply(lambda x: unicode(str(x),"utf-8"))
+
+print("done with loading training data ...")
+
+
+import spacy
+nlp = spacy.load('en')
+
+
+print("done with loading word vectors ...")
+import numpy as np
+
+questions = list(df['question1']) + list(df['question2'])
+vecs1 = []
+max_queslen = 100
+# max = 0
+# for qu in tqdm(list(df['question1'])):
+# 	a = qu.split(' ')
+# 	print(len(a))
+# 	print(len(nlp(qu)))
+
+corpus1 = []
+for qu in tqdm(list(df['question1'])):
+	doc = nlp(qu)
+	document = []
+	# i = 0
+	# print(1)
+	for word in doc:
+		# word2vec
+		vec = word.vector
+		document.append(vec)
+		# i = i + 1
+		# print(vec)
+		# fetch df score
+	document = np.array(document)
+	corpus1.append(document)
+	# print(len(document))
+	# print(len(corpus1))
+	
+	# vecs1.append(doc_3d)
+df['q1_feats'] = list(corpus1)
+
+corpus2 = []
+for qu in tqdm(list(df['question2'])):
+	doc = nlp(qu)
+	document = []
+	# i = 0
+	for word in doc:
+		# word2vec
+		vec = word.vector
+		document.append(vec)
+		# i = i + 1
+		# print(vec)
+		# fetch df score
+	document = np.array(document)
+	corpus2.append(document)
+# exit()
+	# vecs1.append(doc_3d)
+df['q2_feats'] = list(corpus2)
+
+df = df.reindex(np.random.permutation(df.index))
+
+# print(vecs2[1].shape)
+# print(df['q1_feats'][1][0])
+
+# set number of train and test instances
+num_train = int(df.shape[0] * 0.88)
+num_test = df.shape[0] - num_train				 
+print("Number of training pairs: %i"%(num_train))
+print("Number of testing pairs: %i"%(num_test))
+
+X_train = np.zeros([num_train, 2, 384])
+X_test  = np.zeros([num_test, 2, 384])
+Y_train = np.zeros([num_train]) 
+Y_test = np.zeros([num_test])
+
+
+
+Y_train = df[:num_train]['is_duplicate'].values
+Y_test = df[num_train:]['is_duplicate'].values
+
+#-----------------------	PADDING		------------------------------------------------------------
+corpus1 = np.array(corpus1)
+corpus2 = np.array(corpus2)
+
+
+corpus1_new = np.zeros([corpus1.shape[0], max_queslen, corpus1[0].shape[1]])
+corpus2_new = np.zeros([corpus2.shape[0], max_queslen, corpus2[0].shape[1]])
+
+j = 0
+for i in corpus1:
+	if (len(i) == 0):
+		j = j + 1
+		continue
+	if (i.shape[0]<max_queslen):
+		b = np.zeros([max_queslen - i.shape[0], i.shape[1]])
+		i = np.concatenate((i,b), axis = 0)
+	else :
+		i = i[0:max_queslen,]
+	corpus1_new[j] = i
+	j = j + 1
+
+j = 0
+for i in corpus2:
+	if (len(i) == 0):
+		j = j + 1
+		continue
+	if (i.shape[0]<max_queslen):
+		b = np.zeros([max_queslen - i.shape[0], i.shape[1]])
+		i = np.concatenate((i,b), axis = 0)
+	else :
+		i = i[0:max_queslen,]
+	corpus2_new[j] = i
+	j = j + 1
+
+# print(corpus1_new)
+# print(corpus2_new)
+# print(corpus1_new.shape)
+# print(corpus2_new.shape)
+
+X_train1 = corpus1_new[0:num_train,]
+X_train2 = corpus2_new[0:num_train,]
+X_test1 = corpus1_new[num_train:num_train+num_test,]
+X_test2 = corpus2_new[num_train:num_train+num_test,]
+
+
+# def create_bidirLSTM():
+	
+#---------------------- 	Input Prepared	---------------------------------------------
 
 
 
@@ -15,14 +148,13 @@ from tqdm import tqdm
 from keras.models import Sequential, Model
 from keras.layers import Dense, Dropout, Lambda, merge, BatchNormalization, Activation, Input, Merge, Flatten
 from keras import backend as K
-from keras.models import model_from_json
-
 
 from keras.models import Sequential, Model
 from keras.layers import LSTM
 from keras.layers import Dense
 from keras.layers import TimeDistributed
 from keras.layers import Bidirectional
+from keras.models import load_model
 
 
 def euclidean_distance(vects):
@@ -174,178 +306,25 @@ def create_network(input_dim):
 print("FFFFFFFFFFFFFF")
 # from siamese import *
 from keras.optimizers import RMSprop, SGD, Adam
-import spacy
-nlp = spacy.load('en')
-import numpy as np
+net = create_network(384)
 
-for num_file in range(400):
-	print("#################################")
-	print(num_file)
-	print("#################################")
+# train
+#optimizer = SGD(lr=1, momentum=0.8, nesterov=True, decay=0.004)
+optimizer = Adam(lr=0.001)
+net.compile(loss=contrastive_loss, optimizer=optimizer)
+
+print("GGGGGGGGGGGGGGGGGGG")
+
+for epoch in range(50):
+	net.fit([X_train1, X_train2], Y_train,
+		  validation_data=([X_test1, X_test2], Y_test),
+		  batch_size=128, nb_epoch=5, shuffle=True, )
 	
-	filename = "quora_" + str(num_file) + ".tsv"
-	df = pd.read_csv(filename,delimiter='\t')
-
-	# encode questions to unicode
-	df['question1'] = df['question1'].apply(lambda x: unicode(str(x),"utf-8"))
-	df['question2'] = df['question2'].apply(lambda x: unicode(str(x),"utf-8"))
-
-	print("done with loading training data ...")
-
-
-
-
-	print("done with loading word vectors ...")
-
-	questions = list(df['question1']) + list(df['question2'])
-	vecs1 = []
-	max_queslen = 100
-	# max = 0
-	# for qu in tqdm(list(df['question1'])):
-	# 	a = qu.split(' ')
-	# 	print(len(a))
-	# 	print(len(nlp(qu)))
-
-	corpus1 = []
-	for qu in tqdm(list(df['question1'])):
-		doc = nlp(qu)
-		document = []
-		# i = 0
-		# print(1)
-		for word in doc:
-			# word2vec
-			vec = word.vector
-			document.append(vec)
-			# i = i + 1
-			# print(vec)
-			# fetch df score
-		document = np.array(document)
-		corpus1.append(document)
-		# print(len(document))
-		# print(len(corpus1))
-		
-		# vecs1.append(doc_3d)
-	df['q1_feats'] = list(corpus1)
-
-	corpus2 = []
-	for qu in tqdm(list(df['question2'])):
-		doc = nlp(qu)
-		document = []
-		# i = 0
-		for word in doc:
-			# word2vec
-			vec = word.vector
-			document.append(vec)
-			# i = i + 1
-			# print(vec)
-			# fetch df score
-		document = np.array(document)
-		corpus2.append(document)
-	# exit()
-		# vecs1.append(doc_3d)
-	df['q2_feats'] = list(corpus2)
-
-	df = df.reindex(np.random.permutation(df.index))
-
-	# print(vecs2[1].shape)
-	# print(df['q1_feats'][1][0])
-
-	# set number of train and test instances
-	num_train = int(df.shape[0] * 0.88)
-	num_test = df.shape[0] - num_train				 
-	print("Number of training pairs: %i"%(num_train))
-	print("Number of testing pairs: %i"%(num_test))
-
-	X_train = np.zeros([num_train, 2, 384])
-	X_test  = np.zeros([num_test, 2, 384])
-	Y_train = np.zeros([num_train]) 
-	Y_test = np.zeros([num_test])
-
-
-
-	Y_train = df[:num_train]['is_duplicate'].values
-	Y_test = df[num_train:]['is_duplicate'].values
-
-	#-----------------------	PADDING		------------------------------------------------------------
-	corpus1 = np.array(corpus1)
-	corpus2 = np.array(corpus2)
-
-
-	corpus1_new = np.zeros([corpus1.shape[0], max_queslen, corpus1[0].shape[1]])
-	corpus2_new = np.zeros([corpus2.shape[0], max_queslen, corpus2[0].shape[1]])
-
-	j = 0
-	for i in corpus1:
-		if (len(i) == 0):
-			j = j + 1
-			continue
-		if (i.shape[0]<max_queslen):
-			b = np.zeros([max_queslen - i.shape[0], i.shape[1]])
-			i = np.concatenate((i,b), axis = 0)
-		else :
-			i = i[0:max_queslen,]
-		corpus1_new[j] = i
-		j = j + 1
-
-	j = 0
-	for i in corpus2:
-		if (len(i) == 0):
-			j = j + 1
-			continue
-		if (i.shape[0]<max_queslen):
-			b = np.zeros([max_queslen - i.shape[0], i.shape[1]])
-			i = np.concatenate((i,b), axis = 0)
-		else :
-			i = i[0:max_queslen,]
-		corpus2_new[j] = i
-		j = j + 1
-
-	# print(corpus1_new)
-	# print(corpus2_new)
-	# print(corpus1_new.shape)
-	# print(corpus2_new.shape)
-
-	X_train1 = corpus1_new[0:num_train,]
-	X_train2 = corpus2_new[0:num_train,]
-	X_test1 = corpus1_new[num_train:num_train+num_test,]
-	X_test2 = corpus2_new[num_train:num_train+num_test,]
-
-
-	# def create_bidirLSTM():
-		
-	#---------------------- 	Input Prepared	---------------------------------------------
-
-	
-	if (num_file == 0):
-		net = create_network(384)
-
-		# train
-		#optimizer = SGD(lr=1, momentum=0.8, nesterov=True, decay=0.004)
-		
-	else:
-		json_file = open('model.json', 'r')
-		loaded_model_json = json_file.read()
-		json_file.close()
-		net = model_from_json(loaded_model_json)
-
-	optimizer = Adam(lr=0.001)
-	net.compile(loss=contrastive_loss, optimizer=optimizer)
-	print("GGGGGGGGGGGGGGGGGGG")
-
-
-	for epoch in range(10):
-		net.fit([X_train1, X_train2], Y_train,
-			validation_data=([X_test1, X_test2], Y_test),
-			batch_size=64, nb_epoch=1, shuffle=True, )
-		
-		# compute final accuracy on training and test sets
-		pred = net.predict([X_test1, X_test2], batch_size=128)
-		print(pred.shape)
-		te_acc = compute_accuracy(pred, Y_test)
-		# print('* Accuracy on training set: %0.2f%%' % (100 * te_acc))
+	# compute final accuracy on training and test sets
+	pred = net.predict([X_test1, X_test2], batch_size=128)
 	print(pred.shape)
-	print(Y_test.shape)
-	print('* Accuracy on test set: %0.2f%%' % (100 * te_acc))
-	model_json = net.to_json()
-	with open("model.json", "w") as json_file:
-		json_file.write(model_json)
+	te_acc = compute_accuracy(pred, Y_test)
+	# print('* Accuracy on training set: %0.2f%%' % (100 * te_acc))
+print(pred.shape)
+print(Y_test.shape)
+print('* Accuracy on test set: %0.2f%%' % (100 * te_acc))
