@@ -6,7 +6,7 @@ import os
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-df = pd.read_csv("quora_1.tsv",delimiter='\t')
+df = pd.read_csv("quora.tsv",delimiter='\t')
  
 # encode questions to unicode
 df['question1'] = df['question1'].apply(lambda x: unicode(str(x),"utf-8"))
@@ -256,3 +256,7 @@ for epoch in range(50):
 	te_acc = compute_accuracy(pred, Y_test)
 #	print('* Accuracy on training set: %0.2f%%' % (100 * tr_acc))
 print('* Accuracy on test set: %0.2f%%' % (100 * te_acc))
+model_json = net.to_json()
+with open("model_org.json", "w") as json_file:
+	json_file.write(model_json)
+net.save_weights("model_org.h5")
