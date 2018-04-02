@@ -7,7 +7,7 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 df = pd.read_csv("quora.tsv",delimiter='\t')
- 
+
 # encode questions to unicode
 df['question1'] = df['question1'].apply(lambda x: unicode(str(x),"utf-8"))
 df['question2'] = df['question2'].apply(lambda x: unicode(str(x),"utf-8"))
@@ -102,15 +102,18 @@ print("DDDDDDDDDDDDDDDDDDDDDDDDDDDD")
 df = df.reindex(np.random.permutation(df.index))
 
 # set number of train and test instances
-num_train = int(df.shape[0] * 0.88)
-num_test = df.shape[0] - num_train				 
+num_train = int(df.shape[0] * 0.75)
+num_val = int(df.shape[0] * 0.10)
+num_test = df.shape[0] - num_train - num_val				 
 print("Number of training pairs: %i"%(num_train))
 print("Number of testing pairs: %i"%(num_test))
 
 # init data data arrays
 X_train = np.zeros([num_train, 2, 384])
+X_val = np.zeros([num_val, 2, 384])
 X_test  = np.zeros([num_test, 2, 384])
 Y_train = np.zeros([num_train]) 
+Y_val = np.zeros([num_val]) 
 Y_test = np.zeros([num_test])
 
 # format data 
@@ -124,10 +127,15 @@ q2_feats = np.concatenate(b, axis=0)
 X_train[:,0,:] = q1_feats[:num_train]
 X_train[:,1,:] = q2_feats[:num_train]
 Y_train = df[:num_train]['is_duplicate'].values
-			
-X_test[:,0,:] = q1_feats[num_train:]
-X_test[:,1,:] = q2_feats[num_train:]
-Y_test = df[num_train:]['is_duplicate'].values
+
+X_val[:,0,:] = q1_feats[num_train:num_train+num_val]
+X_val[:,1,:] = q2_feats[num_train:num_train+num_val]
+Y_val = df[num_train:num_train+num_val]['is_duplicate'].values
+
+
+X_test[:,0,:] = q1_feats[num_train+num_val:]
+X_test[:,1,:] = q2_feats[num_train+num_val:]
+Y_test = df[num_train+num_val:]['is_duplicate'].values
 
 # remove useless variables
 del b
@@ -146,9 +154,9 @@ from keras import backend as K
 
 def euclidean_distance(vects):
 	x, y = vects
-	a = raw_input("some:")
+	# a = raw_input("some:")
 	print(x)
-	a = raw_input("some:")
+	# a = raw_input("some:")
 	return K.sqrt(K.sum(K.square(x - y), axis=1, keepdims=True))
 
 def eucl_dist_output_shape(shapes):
@@ -224,7 +232,7 @@ def create_network(input_dim):
 	# will be shared across the two branches
 	processed_a = base_network(input_a)
 	processed_b = base_network(input_b)
-	a = raw_input("print something:")
+	# a = raw_input("print something:")
 	print(processed_a)
 	
 	distance = Lambda(euclidean_distance, output_shape=eucl_dist_output_shape)([processed_a, processed_b])
@@ -248,7 +256,7 @@ print("GGGGGGGGGGGGGGGGGGG")
 
 for epoch in range(50):
 	net.fit([X_train[:,0,:], X_train[:,1,:]], Y_train,
-		  validation_data=([X_test[:,0,:], X_test[:,1,:]], Y_test),
+		  validation_data=([X_val[:,0,:], X_val[:,1,:]], Y_val),
 		  batch_size=128, nb_epoch=1, shuffle=True, )
 	
 	# compute final accuracy on training and test sets
@@ -256,7 +264,8 @@ for epoch in range(50):
 	te_acc = compute_accuracy(pred, Y_test)
 #	print('* Accuracy on training set: %0.2f%%' % (100 * tr_acc))
 print('* Accuracy on test set: %0.2f%%' % (100 * te_acc))
+
 model_json = net.to_json()
-with open("model_org.json", "w") as json_file:
+with open("model_val_org.json", "w") as json_file:
 	json_file.write(model_json)
-net.save_weights("model_org.h5")
+net.save_weights("model_val_org.h5")
