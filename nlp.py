@@ -6,6 +6,9 @@ import os
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
+from keras.models import model_from_json
+from keras.models import load_model
+
 df = pd.read_csv("quora.tsv",delimiter='\t')
 
 # encode questions to unicode
@@ -99,11 +102,15 @@ df['q2_feats'] = list(vecs2)
 
 print("DDDDDDDDDDDDDDDDDDDDDDDDDDDD")
 
-df = df.reindex(np.random.permutation(df.index))
+# df = df.reindex(np.random.permutation(df.index))
 
 # set number of train and test instances
 num_train = int(df.shape[0] * 0.75)
 num_val = int(df.shape[0] * 0.10)
+print("##################################")
+print("how many")
+print(num_train + num_val)
+print("##################################")
 num_test = df.shape[0] - num_train - num_val				 
 print("Number of training pairs: %i"%(num_train))
 print("Number of testing pairs: %i"%(num_test))
@@ -242,30 +249,39 @@ def create_network(input_dim):
 
 
 
-print("FFFFFFFFFFFFFF")
-# from siamese import *
-from keras.optimizers import RMSprop, SGD, Adam
-net = create_network(384)
+# print("FFFFFFFFFFFFFF")
+# # from siamese import *
+# from keras.optimizers import RMSprop, SGD, Adam
+# net = create_network(384)
 
 # train
 #optimizer = SGD(lr=1, momentum=0.8, nesterov=True, decay=0.004)
-optimizer = Adam(lr=0.001)
-net.compile(loss=contrastive_loss, optimizer=optimizer)
+# optimizer = Adam(lr=0.001)
+# net.compile(loss=contrastive_loss, optimizer=optimizer)
 
 print("GGGGGGGGGGGGGGGGGGG")
 
+json_file = open('model_val_org.json', 'r')
+loaded_model_json = json_file.read()
+json_file.close()
+net = model_from_json(loaded_model_json)
+net.load_weights("model_val_org.h5")
+
 for epoch in range(50):
-	net.fit([X_train[:,0,:], X_train[:,1,:]], Y_train,
-		  validation_data=([X_val[:,0,:], X_val[:,1,:]], Y_val),
-		  batch_size=128, nb_epoch=1, shuffle=True, )
+	# net.fit([X_train[:,0,:], X_train[:,1,:]], Y_train,
+	# 	  validation_data=([X_val[:,0,:], X_val[:,1,:]], Y_val),
+	# 	  batch_size=128, nb_epoch=1, shuffle=True, )
 	
 	# compute final accuracy on training and test sets
 	pred = net.predict([X_test[:,0,:], X_test[:,1,:]], batch_size=128)
+	pred = np.array(pred)
+	np.save("y_pred_val", pred)
 	te_acc = compute_accuracy(pred, Y_test)
 #	print('* Accuracy on training set: %0.2f%%' % (100 * tr_acc))
 print('* Accuracy on test set: %0.2f%%' % (100 * te_acc))
+np.save("y_test_val", Y_test)
 
-model_json = net.to_json()
-with open("model_val_org.json", "w") as json_file:
-	json_file.write(model_json)
-net.save_weights("model_val_org.h5")
+# model_json = net.to_json()
+# with open("model_val_org.json", "w") as json_file:
+# 	json_file.write(model_json)
+# net.save_weights("model_val_org.h5")

@@ -317,7 +317,7 @@ for num_file in range(300):
 
 	
 	if (num_file == 0):
-		net = create_network(384)
+		net = create_network(vec_size)
 
 		# train
 		#optimizer = SGD(lr=1, momentum=0.8, nesterov=True, decay=0.004)

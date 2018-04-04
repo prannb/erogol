@@ -6,7 +6,7 @@ import os
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
-df = pd.read_csv("quora.tsv",delimiter='\t')
+df = pd.read_csv("quora_train_1.tsv",delimiter='\t')
 
 # encode questions to unicode
 df['question1'] = df['question1'].apply(lambda x: unicode(str(x),"utf-8"))
@@ -46,6 +46,8 @@ print("Number of testing pairs: %i"%(num_test))
 
 # init data data arrays
 vec_size = q1_tf.shape[1]
+print (vec_size)
+exit()
 X_train = np.zeros([num_train, 2, vec_size])
 X_val = np.zeros([num_val, 2, vec_size])
 X_test  = np.zeros([num_test, 2, vec_size])
@@ -194,6 +196,9 @@ optimizer = Adam(lr=0.001)
 net.compile(loss=contrastive_loss, optimizer=optimizer)
 
 print("GGGGGGGGGGGGGGGGGGG")
+
+print (X_train.shape)
+# exit()
 
 for epoch in range(50):
 	net.fit([X_train[:,0,:], X_train[:,1,:]], Y_train,
