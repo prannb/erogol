@@ -149,7 +149,7 @@ def compute_accuracy(predictions, labels):
 	'''
 	Compute classification accuracy with a fixed threshold on distances.
 	'''
-	return np.mean(np.equal(predictions.ravel() < 0.5, labels))
+	return np.mean(np.equal(predictions.ravel() < 0.2, labels))
 
 def create_network(input_dim):
 	# network definition
@@ -178,180 +178,183 @@ import spacy
 nlp = spacy.load('en')
 import numpy as np
 
-for num_file in range(300):
-	print("#################################")
-	print(num_file)
-	print("#################################")
+json_file = open('model.json', 'r')
+loaded_model_json = json_file.read()
+json_file.close()
+net = model_from_json(loaded_model_json)
+net.load_weights("model.h5")
+
+optimizer = Adam(lr=0.001)
+net.compile(loss=contrastive_loss, optimizer=optimizer)
+print("GGGGGGGGGGGGGGGGGGG")
+
+
+# for num_file in range(2):
+# 	print("#################################")
+# 	print(num_file)
+# 	print("#################################")
 	
-	filename = "quora_train_" + str(num_file) + ".tsv"
-	df = pd.read_csv(filename,delimiter='\t')
+# 	filename = "train/quora_train_" + str(num_file) + ".tsv"
+# 	df = pd.read_csv(filename,delimiter='\t')
 
-	# encode questions to unicode
-	df['question1'] = df['question1'].apply(lambda x: unicode(str(x),"utf-8"))
-	df['question2'] = df['question2'].apply(lambda x: unicode(str(x),"utf-8"))
+# 	# encode questions to unicode
+# 	df['question1'] = df['question1'].apply(lambda x: unicode(str(x),"utf-8"))
+# 	df['question2'] = df['question2'].apply(lambda x: unicode(str(x),"utf-8"))
 
-	print("done with loading training data ...")
-
-
+# 	print("done with loading training data ...")
 
 
-	print("done with loading word vectors ...")
 
-	questions = list(df['question1']) + list(df['question2'])
-	vecs1 = []
-	max_queslen = 100
-	# max = 0
-	# for qu in tqdm(list(df['question1'])):
-	# 	a = qu.split(' ')
-	# 	print(len(a))
-	# 	print(len(nlp(qu)))
 
-	corpus1 = []
-	for qu in tqdm(list(df['question1'])):
-		doc = nlp(qu)
-		document = []
-		# i = 0
-		# print(1)
-		for word in doc:
-			# word2vec
-			vec = word.vector
-			document.append(vec)
-			# i = i + 1
-			# print(vec)
-			# fetch df score
-		document = np.array(document)
-		corpus1.append(document)
-		# print(len(document))
-		# print(len(corpus1))
+# 	print("done with loading word vectors ...")
+
+# 	questions = list(df['question1']) + list(df['question2'])
+# 	vecs1 = []
+# 	max_queslen = 100
+# 	# max = 0
+# 	# for qu in tqdm(list(df['question1'])):
+# 	# 	a = qu.split(' ')
+# 	# 	print(len(a))
+# 	# 	print(len(nlp(qu)))
+
+# 	corpus1 = []
+# 	for qu in tqdm(list(df['question1'])):
+# 		doc = nlp(qu)
+# 		document = []
+# 		# i = 0
+# 		# print(1)
+# 		for word in doc:
+# 			# word2vec
+# 			vec = word.vector
+# 			document.append(vec)
+# 			# i = i + 1
+# 			# print(vec)
+# 			# fetch df score
+# 		document = np.array(document)
+# 		corpus1.append(document)
+# 		# print(len(document))
+# 		# print(len(corpus1))
 		
-		# vecs1.append(doc_3d)
-	df['q1_feats'] = list(corpus1)
+# 		# vecs1.append(doc_3d)
+# 	df['q1_feats'] = list(corpus1)
 
-	corpus2 = []
-	for qu in tqdm(list(df['question2'])):
-		doc = nlp(qu)
-		document = []
-		# i = 0
-		for word in doc:
-			# word2vec
-			vec = word.vector
-			document.append(vec)
-			# i = i + 1
-			# print(vec)
-			# fetch df score
-		document = np.array(document)
-		corpus2.append(document)
-	# exit()
-		# vecs1.append(doc_3d)
-	df['q2_feats'] = list(corpus2)
+# 	corpus2 = []
+# 	for qu in tqdm(list(df['question2'])):
+# 		doc = nlp(qu)
+# 		document = []
+# 		# i = 0
+# 		for word in doc:
+# 			# word2vec
+# 			vec = word.vector
+# 			document.append(vec)
+# 			# i = i + 1
+# 			# print(vec)
+# 			# fetch df score
+# 		document = np.array(document)
+# 		corpus2.append(document)
+# 	# exit()
+# 		# vecs1.append(doc_3d)
+# 	df['q2_feats'] = list(corpus2)
 
-	df = df.reindex(np.random.permutation(df.index))
+# 	df = df.reindex(np.random.permutation(df.index))
 
-	# print(vecs2[1].shape)
-	# print(df['q1_feats'][1][0])
+# 	# print(vecs2[1].shape)
+# 	# print(df['q1_feats'][1][0])
 
-	# set number of train and test instances
-	num_train = int(df.shape[0] * 0.88)
-	num_test = df.shape[0] - num_train				 
-	print("Number of training pairs: %i"%(num_train))
-	print("Number of testing pairs: %i"%(num_test))
+# 	# set number of train and test instances
+# 	num_train = int(df.shape[0] * 0.88)
+# 	num_test = df.shape[0] - num_train				 
+# 	print("Number of training pairs: %i"%(num_train))
+# 	print("Number of testing pairs: %i"%(num_test))
 
-	X_train = np.zeros([num_train, 2, 384])
-	X_test  = np.zeros([num_test, 2, 384])
-	Y_train = np.zeros([num_train]) 
-	Y_test = np.zeros([num_test])
-
-
-
-	Y_train = df[:num_train]['is_duplicate'].values
-	Y_test = df[num_train:]['is_duplicate'].values
-
-	#-----------------------	PADDING		------------------------------------------------------------
-	corpus1 = np.array(corpus1)
-	corpus2 = np.array(corpus2)
+# 	X_train = np.zeros([num_train, 2, 384])
+# 	X_test  = np.zeros([num_test, 2, 384])
+# 	Y_train = np.zeros([num_train]) 
+# 	Y_test = np.zeros([num_test])
 
 
-	corpus1_new = np.zeros([corpus1.shape[0], max_queslen, corpus1[0].shape[1]])
-	corpus2_new = np.zeros([corpus2.shape[0], max_queslen, corpus2[0].shape[1]])
 
-	j = 0
-	for i in corpus1:
-		if (len(i) == 0):
-			j = j + 1
-			continue
-		if (i.shape[0]<max_queslen):
-			b = np.zeros([max_queslen - i.shape[0], i.shape[1]])
-			i = np.concatenate((i,b), axis = 0)
-		else :
-			i = i[0:max_queslen,]
-		corpus1_new[j] = i
-		j = j + 1
+# 	Y_train = df[:num_train]['is_duplicate'].values
+# 	Y_test = df[num_train:]['is_duplicate'].values
 
-	j = 0
-	for i in corpus2:
-		if (len(i) == 0):
-			j = j + 1
-			continue
-		if (i.shape[0]<max_queslen):
-			b = np.zeros([max_queslen - i.shape[0], i.shape[1]])
-			i = np.concatenate((i,b), axis = 0)
-		else :
-			i = i[0:max_queslen,]
-		corpus2_new[j] = i
-		j = j + 1
-
-	# print(corpus1_new)
-	# print(corpus2_new)
-	# print(corpus1_new.shape)
-	# print(corpus2_new.shape)
-
-	X_train1 = corpus1_new[0:num_train,]
-	X_train2 = corpus2_new[0:num_train,]
-	X_test1 = corpus1_new[num_train:num_train+num_test,]
-	X_test2 = corpus2_new[num_train:num_train+num_test,]
+# 	#-----------------------	PADDING		------------------------------------------------------------
+# 	corpus1 = np.array(corpus1)
+# 	corpus2 = np.array(corpus2)
 
 
-	# def create_bidirLSTM():
+# 	corpus1_new = np.zeros([corpus1.shape[0], max_queslen, corpus1[0].shape[1]])
+# 	corpus2_new = np.zeros([corpus2.shape[0], max_queslen, corpus2[0].shape[1]])
+
+# 	j = 0
+# 	for i in corpus1:
+# 		if (len(i) == 0):
+# 			j = j + 1
+# 			continue
+# 		if (i.shape[0]<max_queslen):
+# 			b = np.zeros([max_queslen - i.shape[0], i.shape[1]])
+# 			i = np.concatenate((i,b), axis = 0)
+# 		else :
+# 			i = i[0:max_queslen,]
+# 		corpus1_new[j] = i
+# 		j = j + 1
+
+# 	j = 0
+# 	for i in corpus2:
+# 		if (len(i) == 0):
+# 			j = j + 1
+# 			continue
+# 		if (i.shape[0]<max_queslen):
+# 			b = np.zeros([max_queslen - i.shape[0], i.shape[1]])
+# 			i = np.concatenate((i,b), axis = 0)
+# 		else :
+# 			i = i[0:max_queslen,]
+# 		corpus2_new[j] = i
+# 		j = j + 1
+
+# 	# print(corpus1_new)
+# 	# print(corpus2_new)
+# 	# print(corpus1_new.shape)
+# 	# print(corpus2_new.shape)
+
+# 	X_train1 = corpus1_new[0:num_train,]
+# 	X_train2 = corpus2_new[0:num_train,]
+# 	X_test1 = corpus1_new[num_train:num_train+num_test,]
+# 	X_test2 = corpus2_new[num_train:num_train+num_test,]
+
+
+# 	# def create_bidirLSTM():
 		
-	#---------------------- 	Input Prepared	---------------------------------------------
+# 	#---------------------- 	Input Prepared	---------------------------------------------
 
 	
-	if (num_file == 0):
-		net = create_network(vec_size)
+# 	# if (num_file == 0):
+# 	# 	net = create_network(vec_size)
 
-		# train
-		#optimizer = SGD(lr=1, momentum=0.8, nesterov=True, decay=0.004)
+# 	# 	# train
+# 	# 	#optimizer = SGD(lr=1, momentum=0.8, nesterov=True, decay=0.004)
 		
-	else:
-		json_file = open('model.json', 'r')
-		loaded_model_json = json_file.read()
-		json_file.close()
-		net = model_from_json(loaded_model_json)
-		net.load_weights("model.h5")
-
-	optimizer = Adam(lr=0.001)
-	net.compile(loss=contrastive_loss, optimizer=optimizer)
-	print("GGGGGGGGGGGGGGGGGGG")
+# 	# else:
 
 
-	for epoch in range(5):
-		net.fit([X_train1, X_train2], Y_train,
-			validation_data=([X_test1, X_test2], Y_test),
-			batch_size=64, nb_epoch=1, shuffle=True, )
+# 	for epoch in range(5):
+# 		net.fit([X_train1, X_train2], Y_train,
+# 			validation_data=([X_test1, X_test2], Y_test),
+# 			batch_size=64, nb_epoch=1, shuffle=True, )
 		
-		# compute final accuracy on training and test sets
-		# pred = net.predict([X_test1, X_test2], batch_size=128)
-		# print(pred.shape)
-		# te_acc = compute_accuracy(pred, Y_test)
-		# print('* Accuracy on training set: %0.2f%%' % (100 * te_acc))
-	# print(pred.shape)
-	# print(Y_test.shape)
-	# print('* Accuracy on test set: %0.2f%%' % (100 * te_acc))
-	model_json = net.to_json()
-	with open("model.json", "w") as json_file:
-		json_file.write(model_json)
-	net.save_weights("model.h5")
+# 		# compute final accuracy on training and test sets
+# 		# pred = net.predict([X_test1, X_test2], batch_size=128)
+# 		# print(pred.shape)
+# 		# te_acc = compute_accuracy(pred, Y_test)
+# 		# print('* Accuracy on training set: %0.2f%%' % (100 * te_acc))
+# 	# print(pred.shape)
+# 	# print(Y_test.shape)
+# 	# print('* Accuracy on test set: %0.2f%%' % (100 * te_acc))
+	
 
+# model_json = net.to_json()
+# with open("model.json", "w") as json_file:
+# 	json_file.write(model_json)
+# net.save_weights("model.h5")
 
 
 json_file = open('model.json', 'r')
@@ -366,7 +369,7 @@ for num_file in range(80):
 	print(num_file)
 	print("#################################")
 	
-	filename = "quora_test_" + str(num_file) + ".tsv"
+	filename = "test/quora_test_" + str(num_file) + ".tsv"
 	df = pd.read_csv(filename,delimiter='\t')
 
 	# encode questions to unicode
@@ -436,7 +439,7 @@ for num_file in range(80):
 	# set number of train and test instances
 	num_test = int(df.shape[0])
 	# num_test = df.shape[0] - num_train				 
-	print("Number of testing pairs: %i"%(num_train))
+	print("Number of testing pairs: %i"%(num_test))
 	# print("Number of testing pairs: %i"%(num_test))
 
 	X_test = np.zeros([num_test, 2, 384])
@@ -516,7 +519,7 @@ for num_file in range(80):
 	# print("GGGGGGGGGGGGGGGGGGG")
 
 
-	for epoch in range(5):
+	for epoch in range(50):
 		# net.fit([X_train1, X_train2], Y_train,
 			# validation_data=([X_test1, X_test2], Y_test),
 			# batch_size=64, nb_epoch=1, shuffle=True, )
